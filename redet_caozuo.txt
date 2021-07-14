@@ -1,0 +1,25 @@
+git clone https://github.com/zhaogev5/ReDet.git
+conda create -n redet python=3.7 -y
+conda install cython
+conda install pytorch=1.3.1 torchvision cudatoolkit=10.0 -c pytorch -y
+cd ReDet
+bash compile.sh
+pip install requirements.txt
+python setup.py develop
+sudo apt-get install swig
+cd DOTA_devkit
+swig -c++ -python polyiou.i
+python setup.py build_ext --inplace
+
+修改classes=38 DOTA类别
+train.py添加
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+mmdet/core/anchor/anchor_target.py
+            (flat_anchors[:, 0] >= -allowed_border).type(torch.uint8) & \
+            (flat_anchors[:, 1] >= -allowed_border).type(torch.uint8) & \
+            (flat_anchors[:, 2] < img_w + allowed_border).type(torch.uint8) & \
+            (flat_anchors[:, 3] < img_h + allowed_border).type(torch.uint8)
+
+mmdet/ops/riroi_align/src/riroi_align_kernel.cu
+1024->512
